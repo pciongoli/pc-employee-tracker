@@ -1,17 +1,8 @@
-var mysql2 = require('mysql2');
+const express = require('express')
+const db = require('./db/connection');
+const inquirer = require('inquirer');
 
-var inquirer = require('inquirer');
 
-
-
-const connection = mysql2.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'employee_tracker'
-});
-
-function run() {
     inquirer.prompt([
         {
             type: "list",
@@ -40,9 +31,5 @@ function run() {
             }
         })
     ]);
-}
 
 
-
-
-run();
