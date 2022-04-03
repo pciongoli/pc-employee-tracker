@@ -2,6 +2,12 @@ const db = require("./db/connection");
 const inquirer = require("inquirer");
 require("console.table");
 
+let roleData;
+
+function setValue(value) {
+   roleData = value;
+}
+
 const promptUser = () => {
    return inquirer
       .prompt([
@@ -21,7 +27,6 @@ const promptUser = () => {
             ],
          },
       ])
-
       .then(function (answer) {
          if (answer.mainOption === "View All Employees") {
             console.log("View All Employees");
@@ -34,9 +39,34 @@ const promptUser = () => {
             );
          } else if (answer.mainOption === "Add Employee") {
             console.log("Add Employee");
+
+            // var roleResult;
+            db.query(`SELECT * FROM role;`, function (err, results, fields) {
+               let roleTitle = [];
+               for (var i = 0; i < results.length; i++) {
+                  roleTitle.append(results[i]["title"]);
+               }
+               console.log(roleTitle);
+               return inquirer.prompt([
+                  {
+                     type: "input",
+                     name: "firstName",
+                     message: "What is their first name? ",
+                  },
+                  {
+                     type: "input",
+                     name: "lastName",
+                     message: "What is their last name? ",
+                  },
+               ]);
+            });
+
+            // db.query(
+            //   `INSERT INTO employee (first_name, last_name, manager_id, role_id) VALUES ("test_frist", "test_last", 1, 1);`
+            // )
          } else if (answer.mainOption === "View All Roles") {
             console.log("View All Roles");
-            db.query("SELECT * FROM role", function (err, results, fields) {
+            db.query("SELECT * FROM `role`", function (err, results, fields) {
                console.log("\n");
                console.table(results);
             });
@@ -52,18 +82,6 @@ const promptUser = () => {
                      message:
                         "What is the title of the new role you would like to add? ",
                   },
-                  //   {
-                  //      type: "input",
-                  //      name: "salary",
-                  //      message: "What is the annual salary for this position? ",
-                  //   },
-                  //   {
-                  //      type: "list",
-                  //      name: "Name",
-                  //      message:
-                  //         "What is the title of the new role you would like to add? ",
-                  //      choices: ["Engineering", "Financial", "Legal", "Tax"],
-                  //   },
                ])
                .then((answer) => {
                   var roleName = answer.roleName;
@@ -92,7 +110,7 @@ const promptUser = () => {
                .then((answer) => {
                   var departmentName = answer.departmentName;
                   db.query(
-                     `INSERT INTO department (department_name) VALUES ("${departmentName}");`
+                     `INSERT INTO department (name) VALUES ("${departmentName}");`
                   );
                   console.log("new record added");
                });
