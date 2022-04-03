@@ -27,5 +27,3 @@ PRIMARY KEY (id),
 FOREIGN KEY (manager_id) REFERENCES employee(id),
 FOREIGN KEY (role_id) REFERENCES role(id)
 );
-
-DROP TABLE employee, role, department;

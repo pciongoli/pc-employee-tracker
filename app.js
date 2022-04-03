@@ -36,7 +36,7 @@ const promptUser = () => {
             console.log("Add Employee");
          } else if (answer.mainOption === "View All Roles") {
             console.log("View All Roles");
-            db.query("SELECT * FROM `role`", function (err, results, fields) {
+            db.query("SELECT * FROM role", function (err, results, fields) {
                console.log("\n");
                console.table(results);
             });
@@ -44,6 +44,32 @@ const promptUser = () => {
             console.log("Update Employee Role");
          } else if (answer.mainOption === "Add Role") {
             console.log("Add Role");
+            return inquirer
+               .prompt([
+                  {
+                     type: "input",
+                     name: "roleName",
+                     message:
+                        "What is the title of the new role you would like to add? ",
+                  },
+                  //   {
+                  //      type: "input",
+                  //      name: "salary",
+                  //      message: "What is the annual salary for this position? ",
+                  //   },
+                  //   {
+                  //      type: "list",
+                  //      name: "Name",
+                  //      message:
+                  //         "What is the title of the new role you would like to add? ",
+                  //      choices: ["Engineering", "Financial", "Legal", "Tax"],
+                  //   },
+               ])
+               .then((answer) => {
+                  var roleName = answer.roleName;
+                  db.query(`INSERT INTO role (title) VALUES ("${roleName}");`);
+                  console.log("new record added");
+               });
          } else if (answer.mainOption === "View All Departments") {
             console.log("View All Departments");
             db.query(
