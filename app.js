@@ -1,8 +1,10 @@
 const db = require("./db/connection");
 const inquirer = require("inquirer");
+// require process for exit function to end inquirer prompt process
+const { exit } = require("process");
+// allows us to view tables within the console
 require("console.table");
 
-// call async function
 async function promptUser() {
    inquirer
       .prompt([
@@ -33,6 +35,7 @@ async function promptUser() {
                }
             );
             // prompt user again
+
             promptUser();
          } else if (answer.mainOption === "Add Employee") {
             console.log("Add Employee");
@@ -43,14 +46,13 @@ async function promptUser() {
                      `SELECT id, title FROM role;`,
                      (err, resultRole, fields) => {
                         let employees = resultEmployee.map(
-                           // create array for first_name last_name string
                            (e) => e.id + ". " + e.first_name + " " + e.last_name
                         );
                         let roles = resultRole.map(
                            (t) => t.id + ". " + t.title
                         );
 
-                        console.log(employees);
+                        // console.log(employees);
                         inquirer
                            .prompt([
                               {
@@ -78,16 +80,13 @@ async function promptUser() {
                            ])
                            // extract id and then insert it into the employe
                            .then((answer) => {
-                              console.log(
-                                 "Selected role idx: " + answer.role[0]
-                              );
-                              console.log(
-                                 "Selected manager idx: " + answer.manager[0]
-                              );
+                              // console.log("Selected role idx: " + answer.role[0]);
+                              // console.log("Selected manager idx: " + answer.manager[0]);
                               db.query(
                                  `INSERT INTO employee (first_name, last_name, manager_id, role_id) VALUES ("${answer.firstName}", "${answer.lastName}", ${answer.role[0]}, ${answer.manager[0]});`
                               );
                               console.log("New employee added");
+                              // prompt user again
 
                               promptUser();
                            });
@@ -105,19 +104,70 @@ async function promptUser() {
             promptUser();
          } else if (answer.mainOption === "Update Employee Role") {
             console.log("Update Employee Role");
+            // loop query
+
+            db.query(
+               `SELECT * FROM employee`,
+               function (err, employeeResults, fields) {
+                  db.query(
+                     `SELECT * FROM role`,
+                     function (err, roleResults, fields) {
+                        let employeesUpdate = employeeResults.map(
+                           // map out array with given results with map.array
+
+                           (e) => e.id + ". " + e.first_name + " " + e.last_name
+                        );
+                        let rolesUpdate = roleResults.map(
+                           (t) => t.id + ". " + t.title
+                        );
+                        // console.log(employeesUpdate);
+                        // console.log(rolesUpdate);
+                        inquirer
+                           .prompt([
+                              {
+                                 type: "list",
+                                 name: "employeeName",
+                                 message:
+                                    "What is the employee name that needs to be updated? ",
+                                 choices: employeesUpdate,
+                              },
+                              {
+                                 type: "list",
+                                 name: "roleName",
+                                 message: "What is the employee new role? ",
+                                 choices: rolesUpdate,
+                              },
+                           ])
+                           .then((answer) => {
+                              db.query(
+                                 `UPDATE employee SET role_id = ${answer.roleName[0]} WHERE id = ${answer.employeeName[0]};`
+                              );
+
+                              promptUser();
+                           })
+                           .catch((e) => {
+                              console.log("error af");
+                           });
+                     }
+                  );
+               }
+            );
+            // Add Role prompt
          } else if (answer.mainOption === "Add Role") {
             console.log("Add Role");
             db.query(`SELECT * FROM department`, (err, results, fields) => {
-               // mapp out array with given results with map.array
-               departmentNames = results.map((name) => name.name);
-               console.log(departmentNames);
+               // map out array with given results with map.array
+
+               departmentNames = results.map(
+                  (result) => result.id + ". " + result.name
+               );
+               // console.log(departmentNames);
                inquirer
                   .prompt([
                      {
                         type: "input",
-                        name: "roleName",
-                        message:
-                           "What is the title of the new role you would like to add? ",
+                        name: "title",
+                        message: "What is the title of the new role? ",
                      },
                      {
                         type: "input",
@@ -128,14 +178,14 @@ async function promptUser() {
                         type: "list",
                         name: "refDepartmentName",
                         message: "Which department the role belongs to? ",
-                        choices: ["1", "2", "3"],
+                        choices: departmentNames,
                      },
                   ])
                   .then((answer) => {
-                     var roleName = answer.roleName;
-                     // db.query(`INSERT INTO role (title) VALUES ("${roleName}");`)
-                     console.log("new record added");
-
+                     db.query(
+                        `INSERT INTO role (title, salary, department_id) VALUES  ( "${answer.title}", ${answer.salary}, ${answer.refDepartmentName[0]});`
+                     );
+                     console.log("new role added");
                      promptUser();
                   });
             });
@@ -150,6 +200,7 @@ async function promptUser() {
             );
 
             promptUser();
+            // Add Department prompt
          } else if (answer.mainOption === "Add Department") {
             console.log("Add Departments");
             inquirer
@@ -171,6 +222,8 @@ async function promptUser() {
                });
          } else if (answer.mainOption === "Finish") {
             console.log("Finish");
+            // force precess to end via process.exit()
+            exit();
          }
       });
 }
