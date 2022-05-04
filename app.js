@@ -214,7 +214,7 @@ async function promptUser() {
                .then((answer) => {
                   var departmentName = answer.departmentName;
                   db.query(
-                     `INSERT INTO department (name) VALUES ("${departmentName}");`
+                     `INSERT INTO department (department_name) VALUES ("${departmentName}");`
                   );
                   console.log("new record added");
 

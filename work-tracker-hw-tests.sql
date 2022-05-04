@@ -1,6 +1,6 @@
 use employee_tracker;
 
-INSERT INTO department (name) VALUES 
+INSERT INTO department_name VALUES 
 
 
 DELETE FROM department WHERE id > 4;
