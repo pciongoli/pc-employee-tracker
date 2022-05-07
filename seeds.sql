@@ -2,7 +2,7 @@ USE employee_tracker;
 
 SELECT * FROM employee;
 SELECT * FROM department;
-SELECT * FROM role;
+SELECT * FROM `role`;
 
 INSERT INTO department (id, department_name)
 VALUES 
@@ -12,7 +12,7 @@ VALUES
 (4, "Tax");
 SELECT * FROM department;
 
-INSERT INTO role (id, title, salary, department_id)
+INSERT INTO `role` (id, title, salary, department_id)
 VALUES 
 (1, "Sale Lead", 80000, 4),
 (2, "Lead Engineer", 180000, 1),
@@ -31,4 +31,3 @@ INSERT INTO employee (id, first_name, last_name, manager_id, role_id)
 (5, "Lowie", "Smith", 3, 4),
 (6, "Frankie", "J", 1, 3);
 SELECT * FROM employee;
-
